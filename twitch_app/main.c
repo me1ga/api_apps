@@ -18,6 +18,7 @@
 #include "SSL_functions.c"
 #include "SOCKET_functions.c"
 #include "JSON_functions.c"
+#include "JSON_structures.h"
 
 #define FAIL -1
 #define h_addr h_addr_list[0]
@@ -32,6 +33,7 @@ int main(int argc, char const *argv[]){
 	char buffer[BUFFER_LEN];
 	SSL_CTX *ctx;
 	SSL *ssl;
+	struct user user;
 
 	memset(buffer, 0, sizeof(buffer));
 
@@ -49,7 +51,9 @@ int main(int argc, char const *argv[]){
 	SSL_write(ssl, message, sizeof(message));
 	bytes_read = SSL_read(ssl, buffer, sizeof(buffer));
 	RemoveHeaders(&buffer[0], bytes_read);
-	printf("%s\n", buffer);
+	user = ParseUser_v3(buffer);
+	printf("%s\n", user.display_name);
+//	printf("%s\n", buffer);
 
 	/* Высвобождение переменных */
 	SSL_free(ssl);
