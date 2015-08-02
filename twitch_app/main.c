@@ -21,16 +21,19 @@
 
 #define FAIL -1
 #define h_addr h_addr_list[0]
+#define BUFFER_LEN 2048
 
 int main(int argc, char const *argv[]){
 	/* Инициализация переменных */
-	int tcp_sock;
+	int tcp_sock, bytes_read;
 	char host[] = "api.twitch.tv";
 	int port = 443;
-	char message[]="GET https://api.twitch.tv/kraken/users/ws_mega HTTP/1.1\r\nHost: api.twitch.tv\r\nConnection: keep-alive\r\nAccept: application/vnd.twitchtv.v3+json\r\nUser-Agent: Mozilla/5.0 (X11; U; Linux i686; ru; rv:1.9b5) Gecko/2008050509 Firefox/3.0b5\r\n\r\n";
-	char buffer[1024];
+	char message[]="GET /kraken/users/ws_mega HTTP/1.1\r\nHost: api.twitch.tv\r\nAccept: application/vnd.twitchtv.v3+json\r\n\r\n";
+	char buffer[BUFFER_LEN];
 	SSL_CTX *ctx;
 	SSL *ssl;
+
+	memset(buffer, 0, sizeof(buffer));
 
 	SSL_library_init();
 	/* Инициализация сокетов */
@@ -44,8 +47,9 @@ int main(int argc, char const *argv[]){
 		ERR_print_errors_fp(stderr);
 	}
 	SSL_write(ssl, message, sizeof(message));
-	SSL_read(ssl, buffer, sizeof(buffer));
-	printf("%s", buffer);
+	bytes_read = SSL_read(ssl, buffer, sizeof(buffer));
+	RemoveHeaders(&buffer[0], bytes_read);
+	printf("%s\n", buffer);
 
 	/* Высвобождение переменных */
 	SSL_free(ssl);
