@@ -17,7 +17,7 @@
 
 #include "SSL_functions.c"
 #include "SOCKET_functions.c"
-#include "PARSE_functions.c"
+#include "JSON_functions.c"
 
 #define FAIL -1
 #define h_addr h_addr_list[0]
